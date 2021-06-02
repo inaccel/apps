@@ -1,0 +1,21 @@
+name: dockerhub
+on:
+  workflow_dispatch:
+    inputs:
+      app:
+        description: InAccel App
+        required: true
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    - name: Build and push
+      run: make build push
+      working-directory: ${{ github.event.inputs.app }}
