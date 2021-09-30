@@ -1,0 +1,169 @@
+services:
+  2d-reverse-time-migration:
+    command:
+    - python3
+    - /opt/xilinx/rtm2d/python/run.py
+    - --accept-EULA
+    - --config
+    - ${config:-/opt/xilinx/rtm2d/config_sample.json}
+    - --xrt_path
+    - /var/opt/inaccel/runtimes/${mkrt_runtime}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    image: ${image:-xilinx/xf_rtm}:${tag:-rtm2d_AlveoU280_XRT2019.2_V1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    working_dir: ${PWD}
+  anti-money-laundering:
+    command:
+    - /opt/xilinx/apps/vt_data_analytis/aml/bin/vt_data_analytis_aml.exe
+    - --accept-EULA
+    - --in-dir
+    - ${in_dir:-/home/nimbix/demo_data}
+    - --mode
+    - ${mode:-0}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+      opencl:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-xilinx/xilinx_anti_money_laundering}:${tag:-2020.1_v1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    - vendors:/etc/OpenCL/vendors:ro
+    working_dir: ${PWD}
+  database-aggregation:
+    command:
+    - /opt/xilinx/apps/vt_database/aggr/bin/vt_database_aggr.exe
+    - --accept-EULA
+    - --in-dir
+    - ${in_dir:-/opt/xilinx/apps/vt_database/aggr/share/data}
+    - --scale
+    - ${scale:-10}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-xilinx/xilinx_db_aggregation_demo}:${tag:-u280_2020.1_v1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    working_dir: ${PWD}
+  database-join:
+    command:
+    - /opt/xilinx/apps/vt_database/join/bin/vt_database_join.exe
+    - --accept-EULA
+    - --in-dir
+    - ${in_dir:-/opt/xilinx/apps/vt_database/join/share/data}
+    - --out-dir
+    - ${out_dir:-}
+    - --scale
+    - ${scale:-10}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-xilinx/xilinx_db_join_demo}:${tag:-u280_2020.1_v1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    working_dir: ${PWD}
+  gzip-compression-decompression:
+    command:
+    - xgzip
+    - --${mode:-test}
+    - ${file:-/Xilinx_notice_and_disclaimer.txt}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+      opencl:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-xilinx/data_compression}:${tag:-gzip-u50-2020.1-v1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    - vendors:/etc/OpenCL/vendors:ro
+    working_dir: ${PWD}
+  integer-sorting:
+    command:
+    - /opt/xilinx/apps/vt_database/sort/bin/vt_database_sort.exe
+    - --accept-EULA
+    - --asc
+    - ${asc:-1}
+    - --files-in
+    - ${files_in:-}
+    - --files-out
+    - ${files_out:-}
+    - --in
+    - ${in:-}
+    - --out
+    - ${out:-}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-xilinx/xilinx_sorting}:${tag:-u200_2020.1_v1.0}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    working_dir: ${PWD}
+  mkrt:
+    environment:
+      MKRT_CONFIG_PATH: ${XDG_CONFIG_HOME:-/etc}/inaccel/runtimes
+      MKRT_SYSROOT_DIR: /host
+    image: ${mkrt_image}:${mkrt_tag}
+    restart: on-failure
+    volumes:
+    - /:/host:ro
+    - runtimes:/var/opt/inaccel/runtimes
+  opencl:
+    command:
+    - 'echo /var/opt/inaccel/runtimes/${mkrt_runtime}/lib/libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd'
+    entrypoint:
+    - /bin/sh
+    - -c
+    image: alpine
+    volumes:
+    - vendors:/etc/OpenCL/vendors
+volumes:
+  runtimes:
+  vendors:
