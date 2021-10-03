@@ -1,0 +1,48 @@
+services:
+  deepfield-sr:
+    command:
+    - -ss
+    - ${time_off:-0}
+    - -t
+    - ${duration:-5}
+    - -i
+    - ${infile:-/app/test_720p.mp4}
+    - -c:v
+    - ${codec:-libx264}
+    - -b:v
+    - ${bitrate:-20M}
+    - -vf
+    - ${filter_graph:-scale_startrek=w=iw*2:h=ih*:fpga=f1}
+    - ${outfile:-output_4k.mp4}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri
+    entrypoint:
+    - /var/opt/inaccel/runtimes/${mkrt_runtime}/ld.so
+    - --inhibit-rpath
+    - /app/libstartrek.so
+    - /app/ffmpeg
+    environment:
+      LD_LIBRARY_PATH: /app:/var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-hubxilinx/bluedot_deepfield-sr_aws_f1}:${tag:-vitis_2021.1}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - ${access_key:?The access_key variable is not set.}:/app/cred.json:ro
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    working_dir: /app
+  mkrt:
+    environment:
+      MKRT_CONFIG_PATH: ${XDG_CONFIG_HOME:-/etc}/inaccel/runtimes
+      MKRT_SYSROOT_DIR: /host
+    image: ${mkrt_image}:${mkrt_tag}
+    restart: on-failure
+    volumes:
+    - /:/host:ro
+    - runtimes:/var/opt/inaccel/runtimes
+volumes:
+  runtimes:
