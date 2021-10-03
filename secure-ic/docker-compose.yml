@@ -1,0 +1,47 @@
+services:
+  trng:
+    command:
+    - ${mb_qty:-128}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+      opencl:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri/${device}
+    entrypoint:
+    - /var/opt/inaccel/runtimes/${mkrt_runtime}/ld.so
+    - /usr/local/bin/app
+    - /usr/local/share/app.xclbin
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    image: ${image:-hubxilinx/secureic_trng_alveo_u200}:${tag:-2021.1}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:/data
+    - ${access_key:?The access_key variable is not set.}:/home/appuser/cred.json:ro
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    - vendors:/etc/OpenCL/vendors:ro
+  mkrt:
+    environment:
+      MKRT_CONFIG_PATH: ${XDG_CONFIG_HOME:-/etc}/inaccel/runtimes
+      MKRT_SYSROOT_DIR: /host
+    image: ${mkrt_image}:${mkrt_tag}
+    restart: on-failure
+    volumes:
+    - /:/host:ro
+    - runtimes:/var/opt/inaccel/runtimes
+  opencl:
+    command:
+    - 'echo /var/opt/inaccel/runtimes/${mkrt_runtime}/lib/libxilinxopencl.so > /etc/OpenCL/vendors/xilinx.icd'
+    entrypoint:
+    - /bin/sh
+    - -c
+    image: alpine
+    volumes:
+    - vendors:/etc/OpenCL/vendors
+volumes:
+  runtimes:
+  vendors:
