@@ -1,0 +1,39 @@
+x-trng: &trng
+  command:
+  - ${num32:-1000}
+  depends_on:
+    mkrt:
+      condition: service_completed_successfully
+  devices:
+  - /dev/dri/${device}
+  entrypoint:
+  - /var/opt/inaccel/runtimes/${mkrt_runtime}/ld.so
+  - /app
+  - /app.xclbin
+  environment:
+    LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib
+    XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+  shm_size: ${shm_size:-}
+  user: ${UID}:${GID}
+  volumes:
+  - ${PWD}:/data
+  - ${access_key:?The access_key variable is not set.}:/cred.json:ro
+  - runtimes:/var/opt/inaccel/runtimes:ro
+services:
+  trng-u200:
+    <<: *trng
+    image: ${image:-hubxilinx/silex_ba431_u200}:${tag:-latest}
+  trng-u50:
+    <<: *trng
+    image: ${image:-hubxilinx/silex_ba431_u50}:${tag:-latest}
+  mkrt:
+    environment:
+      MKRT_CONFIG_PATH: ${XDG_CONFIG_HOME:-/etc}/inaccel/runtimes
+      MKRT_SYSROOT_DIR: /host
+    image: ${mkrt_image}:${mkrt_tag}
+    restart: on-failure
+    volumes:
+    - /:/host:ro
+    - runtimes:/var/opt/inaccel/runtimes
+volumes:
+  runtimes:
