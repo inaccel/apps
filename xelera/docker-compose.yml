@@ -1,0 +1,48 @@
+x-flight-delay: &flight-delay
+  command:
+  - --data_fpath=${data_fpath:-flights.csv}
+  - --enable_binomial=${enable_binomial:-false}
+  - --enable_FPGA_inference=${enable_FPGA_inference:-true}
+  - --enable_multinomial=${enable_multinomial:-true}
+  - --enable_regression=${enable_regression:-false}
+  - --enable_SW_inference=${enable_SW_inference:-true}
+  - --max_depth=${max_depth:-8}
+  - --n_loops=${n_loops:-1000}
+  - --num_test_samples=${num_test_samples:-1000}
+  - --number_of_trees=${number_of_trees:-100}
+  depends_on:
+    git:
+      condition: service_completed_successfully
+  devices:
+  - /dev/dri/${device}
+  entrypoint:
+  - /usr/bin/python3
+  - /app/scripts/RF_scikit_flight.py
+  image: ${image:-xilinxpartners/xelera_decision_tree_inference}:${tag:-alveo_u50_2020.2_0.6.0b6drm}
+  shm_size: ${shm_size:-}
+  user: ${UID}:${GID}
+  volumes:
+  - ${PWD}:${PWD}
+  - ${access_key:?The access_key variable is not set.}:/opt/xelera/cred.json:ro
+  - app:/app
+  working_dir: ${PWD}
+services:
+  flight-delay-u200:
+    <<: *flight-delay
+    image: ${image:-xilinxpartners/xelera_decision_tree_inference}:${tag:-alveo_u200_2020.2_0.6.0b6drm}
+  flight-delay-u50:
+    <<: *flight-delay
+    image: ${image:-xilinxpartners/xelera_decision_tree_inference}:${tag:-alveo_u50_2020.2_0.6.0b6drm}
+  git:
+    command:
+    - clone
+    - --depth=1
+    - ${repo:-https://github.com/xelera-technologies/Tree-Inference.git}
+    - app
+    image: alpine/git
+    restart: on-failure
+    volumes:
+    - app:/app
+    working_dir: /
+volumes:
+  app:
