@@ -1,0 +1,55 @@
+services:
+  ffmpeg:
+    command:
+    - -pix_fmt
+    - ${pixel_format:-yuv420p}
+    - -r
+    - ${frame_rate:-60}
+    - -s
+    - ${frame_size:-3840x2160}
+    - -stream_loop
+    - ${stream_loop:-3}
+    - -vcodec
+    - ${video_codec:-rawvideo}
+    - -y
+    - -i
+    - ${infile:-/samples/sample_3840x2160_8bit_P420.yuv}
+    - -b:v
+    - ${video_bitrate:-8000k}
+    - -base_encoder
+    - ${base_encoder:-ngcodec_sdx_hevc}
+    - -c:v
+    - ${codec:-pplusenc_hevc}
+    - -eil_params
+    - ${eil_params:-accel_type=xilinx_xma;encoding_transform_type=dd;temporal_enabled=0;temporal_use_refresh=0;api_mode=asynchronous;baseEncType=ngcodec;xclbinHasNGC=1;encoding_downsample_luma=area;encoding_upsample=cubic;rate_control_mode=variableratio;rc_bucket_duration_ms=2000;encoding_step_width_model=v1;encoding_step_width_min_qp=41;bitrate_max_base_prop=0.8;bitrate_base_prop=0.8;perseus_mode=robust;qp_min=30;xma_config=/vnova_pplus/SystemCfg_194.yaml}
+    - ${outfile:-/data/output.ts}
+    depends_on:
+      mkrt:
+        condition: service_completed_successfully
+    devices:
+    - /dev/dri/${device}
+    entrypoint:
+    - /var/opt/inaccel/runtimes/${mkrt_runtime}/ld.so
+    - /vnova_pplus/ffmpeg_vnova_dist
+    environment:
+      LD_LIBRARY_PATH: /var/opt/inaccel/runtimes/${mkrt_runtime}/lib:/usr/lib64:/vnova_pplus:/opt/xilinx/xrt/lib
+      XILINX_XRT: /var/opt/inaccel/runtimes/${mkrt_runtime}
+    shm_size: ${shm_size:-}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:/data
+    - ${access_key:?The access_key variable is not set.}:/vnova_pplus/cred.json:ro
+    - runtimes:/var/opt/inaccel/runtimes:ro
+    image: ${image:-xilinxpartners/vnova_pplus}:${tag:-alveo_u200_ppxde_demo}
+    working_dir: /vnova_pplus
+  mkrt:
+    environment:
+      MKRT_CONFIG_PATH: ${XDG_CONFIG_HOME:-/etc}/inaccel/runtimes
+      MKRT_SYSROOT_DIR: /host
+    image: ${mkrt_image}:${mkrt_tag}
+    restart: on-failure
+    volumes:
+    - /:/host:ro
+    - runtimes:/var/opt/inaccel/runtimes
+volumes:
+  runtimes:
