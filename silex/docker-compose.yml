@@ -23,6 +23,9 @@ services:
   trng-u200:
     <<: *trng
     image: ${image:-hubxilinx/silex_ba431_u200}:${tag:-latest}
+  trng-u250:
+    <<: *trng
+    image: ${image:-hubxilinx/silex_ba431_u250}:${tag:-latest}
   trng-u50:
     <<: *trng
     image: ${image:-hubxilinx/silex_ba431_u50}:${tag:-latest}
