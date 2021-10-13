@@ -6,13 +6,13 @@
 
 ```sh
 # Xilinx Alveo U200
-docker inaccel run -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:silex trng-u200 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t silex run trng-u200 --
 
 # Xilinx Alveo U250
-docker inaccel run -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:silex trng-u250 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t silex run trng-u250 --
 
 # Xilinx Alveo U50
-docker inaccel run -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:silex trng-u50 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t silex run trng-u50 --
 ```
 
 | Environment Variable | Default |

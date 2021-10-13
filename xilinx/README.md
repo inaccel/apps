@@ -3,7 +3,7 @@
 - xilinx_u280_xdma_201920_1
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run 2d-reverse-time-migration
+docker inaccel -e PWD -p inaccel/apps -t xilinx run 2d-reverse-time-migration
 ```
 
 | Environment Variable | Default                                |
@@ -17,7 +17,7 @@ docker inaccel -e PWD -t inaccel/apps:xilinx run 2d-reverse-time-migration
 - xilinx_u50_gen3x16_xdma_201920_3
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run anti-money-laundering
+docker inaccel -e PWD -p inaccel/apps -t xilinx run anti-money-laundering
 ```
 
 | Environment Variable | Default                  |
@@ -30,7 +30,7 @@ docker inaccel -e PWD -t inaccel/apps:xilinx run anti-money-laundering
 - xilinx_u280_xdma_201920_1
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run database-aggregation
+docker inaccel -e PWD -p inaccel/apps -t xilinx run database-aggregation
 ```
 
 | Environment Variable | Default                                        |
@@ -43,7 +43,7 @@ docker inaccel -e PWD -t inaccel/apps:xilinx run database-aggregation
 - xilinx_u280_xdma_201920_1
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run database-join
+docker inaccel -e PWD -p inaccel/apps -t xilinx run database-join
 ```
 
 | Environment Variable | Default                                        |
@@ -57,7 +57,7 @@ docker inaccel -e PWD -t inaccel/apps:xilinx run database-join
 - xilinx_u50_gen3x16_xdma_201920_3
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run gzip-compression-decompression
+docker inaccel -e PWD -p inaccel/apps -t xilinx run gzip-compression-decompression
 ```
 
 | Environment Variable | Default                             |
@@ -70,7 +70,7 @@ docker inaccel -e PWD -t inaccel/apps:xilinx run gzip-compression-decompression
 - xilinx_u200_xdma_201830_2
 
 ```sh
-docker inaccel -e PWD -t inaccel/apps:xilinx run integer-sorting
+docker inaccel -e PWD -p inaccel/apps -t xilinx run integer-sorting
 ```
 
 | Environment Variable | Default |

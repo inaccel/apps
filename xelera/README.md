@@ -9,10 +9,10 @@ wget --content-disposition "https://share.xelera.io/download.php?id=23&token=UJg
 unzip flight_dataset.zip
 
 # Xilinx Alveo U200
-docker inaccel run -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:xelera flight-delay-u200 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t xelera run flight-delay-u200 --
 
 # Xilinx Alveo U50
-docker inaccel run -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:xelera flight-delay-u50 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t xelera run flight-delay-u50 --
 ```
 
 | Environment Variable    | Default       |

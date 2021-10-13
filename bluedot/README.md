@@ -3,7 +3,7 @@
 - xilinx_aws-vu9p-f1_shell-v04261818_201920.2
 
 ```sh
-docker inaccel -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:bluedot run deepfield-sr --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t bluedot run deepfield-sr --
 ```
 
 | Environment Variable | Default                                |

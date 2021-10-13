@@ -5,11 +5,10 @@
 
 ```sh
 # AWS VU9P
-docker inaccel -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:secure-ic run trng-aws --
-
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t secure-ic run trng-aws --
 
 # Xilinx Alveo U200
-docker inaccel -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:secure-ic run trng-u200 --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t secure-ic run trng-u200 --
 ```
 
 | Environment Variable | Default |

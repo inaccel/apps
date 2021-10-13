@@ -3,7 +3,7 @@
 -   xilinx_u200_xdma_201830_2
 
 ```sh
-docker inaccel -e PWD -e access_key=$PWD/cred.json -t inaccel/apps:v-nova run ffmpeg --
+docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t v-nova run ffmpeg --
 ```
 
 | Environment Variable | Default                                   |
