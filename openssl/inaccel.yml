@@ -1,0 +1,7 @@
+services:
+  aes:
+    build: aes
+    image: ${image}:${tag}-aes
+  invoc:
+    build: .
+    image: ${image}:${tag}
