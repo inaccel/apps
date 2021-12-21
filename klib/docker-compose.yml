@@ -1,0 +1,22 @@
+services:
+  ksw:
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    image: ${image}:${tag}-ksw
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - volume:/var/lib/inaccel
+    working_dir: ${PWD}
+  init:
+    command:
+    - bitstream
+    - install
+    - ${repository}/${platform:?The platform variable is not set.}/${bitstream}
+    image: inaccel/cli
+    volumes:
+    - volume:/var/lib/inaccel
+volumes:
+  volume:
+    driver: inaccel

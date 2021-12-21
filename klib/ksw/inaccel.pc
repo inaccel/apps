@@ -1,0 +1,4 @@
+Name: klib/ksw
+Version: 0
+Description: inaccel/apps
+URL: https://github.com/inaccel/apps

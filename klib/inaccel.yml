@@ -1,0 +1,7 @@
+services:
+  ksw:
+    build: ksw
+    image: ${image}:${tag}-ksw
+  invoc:
+    build: .
+    image: ${image}:${tag}
