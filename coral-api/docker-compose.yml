@@ -1,0 +1,12 @@
+services:
+  shell:
+    image: ${image}:${tag}-shell
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - volume:/var/lib/inaccel
+    working_dir: ${PWD}
+volumes:
+  volume:
+    external: true
+    name: ${volume}

@@ -1,0 +1,7 @@
+services:
+  invoc:
+    build: .
+    image: ${image}:${tag}
+  shell:
+    build: shell
+    image: ${image}:${tag}-shell
