@@ -1,0 +1,32 @@
+services:
+  parameter-tuning:
+    command:
+    - --alpha=${alpha}
+    - --eta=${eta}
+    - --max-depth=${max_depth}
+    - --name=${name}
+    - --num-boost-round=${num_boost_round}
+    - --subsample=${subsample}
+    - --test-size=${test_size}
+    - --tree-method=${tree_method}
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    entrypoint:
+    - python3
+    - XGBoost/parameter-tuning.py
+    image: inaccel/jupyter:lab
+    volumes:
+    - volume:/var/lib/inaccel
+  init:
+    command:
+    - bitstream
+    - install
+    - --mode=others
+    - ${repository}/${platform}/${bitstream}
+    image: inaccel/cli
+    volumes:
+    - volume:/var/lib/inaccel
+volumes:
+  volume:
+    driver: inaccel
