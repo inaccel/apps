@@ -1,6 +1,6 @@
 ## deepfield-sr
 
-- xilinx_aws-vu9p-f1_shell-v04261818_201920.2
+- xilinx_aws-vu9p-f1_dynamic-shell
 
 ```sh
 docker inaccel -e PWD -e access_key=$PWD/cred.json -p inaccel/apps -t bluedot run deepfield-sr --

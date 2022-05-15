@@ -1,6 +1,6 @@
 ## trng
 
--   xilinx_aws-vu9p-f1_dynamic_5_0
+-   xilinx_aws-vu9p-f1_dynamic-shell
 -   xilinx_u200_xdma_201830_2
 
 ```sh
