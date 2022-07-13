@@ -1,0 +1,34 @@
+services:
+  Tracking:
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    entrypoint:
+    - /code/startup.sh
+    - Tracking
+    image: ${image}:${tag}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    - volume:/var/lib/inaccel
+    working_dir: ${PWD}
+  TractSeg:
+    entrypoint:
+    - /code/startup.sh
+    - TractSeg
+    image: ${image}:${tag}
+    user: ${UID}:${GID}
+    volumes:
+    - ${PWD}:${PWD}
+    working_dir: ${PWD}
+  init:
+    command:
+    - bitstream
+    - install
+    - ${repository}/${platform}/${bitstream}
+    image: inaccel/cli
+    volumes:
+    - volume:/var/lib/inaccel
+volumes:
+  volume:
+    driver: inaccel

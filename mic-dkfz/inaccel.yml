@@ -1,0 +1,4 @@
+services:
+  invoc:
+    build: .
+    image: inaccel/apps:mic-dkfz
