@@ -1,0 +1,79 @@
+services:
+  keygen:
+    entrypoint:
+    - heflow-keygen
+    - -f
+    - /etc/heflow/id_ckks
+    image: ${image}:${tag}
+    volumes:
+    - volume:/etc/heflow
+    working_dir: /workspace
+  model:
+    depends_on:
+      ui:
+        condition: service_healthy
+    entrypoint:
+    - mlflow
+    - models
+    - serve
+    - --enable-mlserver
+    - --env-manager=local
+    - --port=8081
+    - --model-uri
+    environment:
+      HEFLOW_CKKS: /etc/heflow/id_ckks.pub
+      MLFLOW_TRACKING_URI: http://localhost:5000
+      MLSERVER_GRPC_MAX_MESSAGE_LENGTH: -1
+      MLSERVER_GRPC_PORT: 8080
+    image: ${image}:${tag}
+    network_mode: host
+    volumes:
+    - volume:/etc/heflow:ro
+    working_dir: /workspace
+  project:
+    depends_on:
+      ui:
+        condition: service_healthy
+    entrypoint:
+    - mlflow
+    - run
+    - --env-manager=local
+    environment:
+      HEFLOW_CKKS: /etc/heflow/id_ckks.pub
+      MLFLOW_TRACKING_URI: http://localhost:5000
+    image: ${image}:${tag}
+    network_mode: host
+    volumes:
+    - volume:/etc/heflow
+    working_dir: /workspace
+  shell:
+    depends_on:
+      ui:
+        condition: service_healthy
+    environment:
+      HEFLOW_CKKS: /etc/heflow/id_ckks
+      MLFLOW_TRACKING_URI: http://localhost:5000
+    image: ${image}:${tag}
+    network_mode: host
+    volumes:
+    - volume:/etc/heflow:ro
+    working_dir: /workspace
+  ui:
+    entrypoint:
+    - mlflow
+    - ui
+    - --backend-store-uri=/etc/heflow/mlruns
+    - --no-serve-artifacts
+    healthcheck:
+      test:
+      - CMD
+      - curl
+      - --fail
+      - http://localhost:5000
+    image: ${image}:${tag}
+    network_mode: host
+    volumes:
+    - volume:/etc/heflow
+    working_dir: /workspace
+volumes:
+  volume:
