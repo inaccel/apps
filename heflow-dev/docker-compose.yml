@@ -1,9 +1,10 @@
 services:
   keygen:
     entrypoint:
-    - heflow-keygen
-    - -f
-    - /etc/heflow/id_ckks
+    - sh
+    - -c
+    command:
+    - echo no | heflow-keygen -f /etc/heflow/id_ckks || true
     image: ${image}:${tag}
     volumes:
     - volume:/etc/heflow
@@ -59,6 +60,9 @@ services:
     - volume:/etc/heflow:ro
     working_dir: /workspace
   ui:
+    depends_on:
+      keygen:
+        condition: service_completed_successfully
     entrypoint:
     - mlflow
     - ui
