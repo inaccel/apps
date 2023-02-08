@@ -16,7 +16,40 @@ centimeters. The dataset is from UCI’s
 
 To run this tutorial, you’ll need to:
 
-* Install Docker and [Docker InAccel](https://github.com/inaccel/docker)
+* Install [Docker](https://docs.docker.com/engine/install)
+
+* Install [Docker InAccel](https://github.com/inaccel/docker). There are two
+options for installing this dependency:
+
+	* Install it manually and manage upgrades manually.
+
+		* Go to https://github.com/inaccel/docker/releases.
+
+		* Download the `deb` or`rpm` file for the Docker InAccel package.
+
+			* `inaccel-docker_<version>_amd64.deb`
+
+			* `inaccel-docker-<version>-1.x86_64.rpm`
+
+		* Install the `.deb` or`.rpm` package.
+
+			* `sudo apt install ./inaccel-docker_<version>_amd64.deb`
+
+			* `sudo yum install ./inaccel-docker-<version>-1.x86_64.rpm`
+
+	* Set up and install Docker InAccel from
+	[InAccel’s repository](https://setup.inaccel.com).
+
+		* InAccel provides a convenience script to setup InAccel repository
+		non-interactively:
+
+			`curl -sS https://setup.inaccel.com/repository | sh`
+
+		* Install Docker InAccel.
+
+			* `sudo apt install inaccel-docker`
+
+			* `sudo yum install inaccel-docker`
 
 ### Training and Encrypting the Model
 
