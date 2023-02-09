@@ -21,31 +21,31 @@ To run this tutorial, you’ll need to:
 * Install [Docker InAccel](https://github.com/inaccel/docker). There are two
 options for installing this dependency:
 
-	* Install it manually and manage upgrades manually.
+	1. Install it manually and manage upgrades manually.
 
-		* Go to https://github.com/inaccel/docker/releases.
+		1. Go to https://github.com/inaccel/docker/releases.
 
-		* Download the `deb` or`rpm` file for the Docker InAccel package.
+		2. Download the `deb` or`rpm` file for the Docker InAccel package.
 
 			* `inaccel-docker_<version>_amd64.deb`
 
 			* `inaccel-docker-<version>-1.x86_64.rpm`
 
-		* Install the `.deb` or`.rpm` package.
+		3. Install the `.deb` or`.rpm` package.
 
 			* `sudo apt install ./inaccel-docker_<version>_amd64.deb`
 
 			* `sudo yum install ./inaccel-docker-<version>-1.x86_64.rpm`
 
-	* Set up and install Docker InAccel from
+	2. Set up and install Docker InAccel from
 	[InAccel’s repository](https://setup.inaccel.com).
 
-		* InAccel provides a convenience script to setup InAccel repository
+		1. InAccel provides a convenience script to setup InAccel repository
 		non-interactively:
 
 			`curl -sS https://setup.inaccel.com/repository | sh`
 
-		* Install Docker InAccel.
+		2. Install Docker InAccel.
 
 			* `sudo apt install inaccel-docker`
 
@@ -53,11 +53,15 @@ options for installing this dependency:
 
 ### Training and Encrypting the Model
 
-First, train and encrypt a logistic regression model. The code is located at
+First, train and encrypt a logistic regression model that takes three
+hyperparameters: `C`, `solver` and `max_iter`.
+
+The code is located at
 [`examples/sklearn/train.py`](https://github.com/inaccel/heflow/blob/master/examples/sklearn/train.py)
 and is reproduced below.
 
 ```python
+import click
 import heflow.sklearn
 import mlflow.sklearn
 import sklearn.datasets
@@ -65,33 +69,49 @@ import sklearn.linear_model
 import sklearn.metrics
 import sklearn.model_selection
 
-X, y = sklearn.datasets.fetch_openml('iris', return_X_y=True)
 
-X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
-    X, y, test_size=3, random_state=42)
+@click.command(context_settings={
+    'allow_extra_args': True,
+    'ignore_unknown_options': True
+})
+@click.option('--C', default=1.0)
+@click.option('--solver', default='lbfgs')
+@click.option('--max-iter', default=100)
+def train(c, solver, max_iter):
+    X, y = sklearn.datasets.fetch_openml('iris', return_X_y=True)
 
-mlflow.sklearn.autolog(log_models=False)
+    X_train, X_test, y_train, y_test = sklearn.model_selection.train_test_split(
+        X, y, test_size=3, random_state=42)
 
-with mlflow.start_run():
-    lr = sklearn.linear_model.LogisticRegression()
+    mlflow.sklearn.autolog(log_models=False)
 
-    model = lr.fit(X_train, y_train)
+    with mlflow.start_run():
+        lr = sklearn.linear_model.LogisticRegression(C=c,
+                                                     solver=solver,
+                                                     max_iter=max_iter)
 
-    predictions = model.predict(X_test)
+        model = lr.fit(X_train, y_train)
 
-    print('predictions=%s' % predictions)
+        predictions = model.predict(X_test)
 
-    print('accuracy=%.3f' %
-          sklearn.metrics.accuracy_score(y_test, predictions))
+        print('predictions=%s' % predictions)
 
-    heflow.sklearn.log_model(model)
+        print('accuracy=%.3f' %
+              sklearn.metrics.accuracy_score(y_test, predictions))
+
+        heflow.sklearn.log_model(model)
+
+
+if __name__ == '__main__':
+    train()
 ```
 
 This example uses the familiar sklearn APIs to create a simple machine learning
 model. The MLflow tracking APIs log information about each training run, like
-the hyperparameters used to train the model and metrics, like the accuracy,
-used to evaluate the model. The example also encrypts the model with HEflow and
-serializes it in a format that MLflow knows how to deploy.
+the hyperparameters `C`, `solver` and `max_iter`, used to train the model and
+metrics, like the accuracy, used to evaluate the model. The example also
+encrypts the model with HEflow and serializes it in a format that MLflow knows
+how to deploy.
 
 You can run the example with default hyperparameters as follows:
 
@@ -103,6 +123,14 @@ docker inaccel -p inaccel/heflow-dev run project https://github.com/inaccel/hefl
 options. For example, the `INACCEL_PROJECT_NAME` environment variable relates to
 the `-p` flag.
 
+Try out some other values for `C`, `solver` and `max_iter` by passing them as
+arguments to `train.py`:
+
+```sh
+docker inaccel -p inaccel/heflow-dev run project https://github.com/inaccel/heflow#examples/sklearn -- \
+	-P C=10.0 -P solver=liblinear -P max_iter=50
+```
+
 Each time you run the example, MLflow logs information about your experiment
 runs.
 
@@ -112,7 +140,7 @@ Next, use the MLflow UI, at http://localhost:5000, to compare the models that
 you have produced.
 
 On this page, you can see a list of experiment runs with metrics you can use to
-compare your models.
+compare the models.
 
 ![ui](img/ui.png)
 
@@ -139,10 +167,10 @@ the list of experiment runs you’ll see this page.
 
 ![model](img/model.png)
 
-The call to `heflow.sklearn.log_model` produced two files. The first file,
-`MLmodel`, is a metadata file that tells MLflow how to load the model. The
-second file, `python_model.pkl`, is a serialized version of the encrypted
-logistic regression model that you trained.
+At the bottom, you can see that the call to `heflow.sklearn.log_model` produced
+two files. The first file, `MLmodel`, is a metadata file that tells MLflow how
+to load the model. The second file, `python_model.pkl`, is a serialized version
+of the encrypted logistic regression model that you trained.
 
 In this example, you can use this MLmodel format with MLflow to deploy a local
 gRPC server that can serve predictions.
@@ -156,7 +184,7 @@ docker inaccel -p inaccel/heflow-dev run model runs:/<Run ID>/model
 Once you have deployed the server, you can pass it some sample data and see the
 predictions.
 
-Login to an interactive HEflow Dev Python shell to run the example:
+Open an interactive HEflow Dev Python shell to run the example:
 
 ```sh
 docker inaccel -p inaccel/heflow-dev run shell
