@@ -45,6 +45,7 @@ services:
     image: ${image}:${tag}
     network_mode: host
     volumes:
+    - ${PWD:-/tmp/heflow}:/workspace:ro
     - volume:/etc/heflow
     working_dir: /workspace
   shell:
@@ -57,6 +58,7 @@ services:
     image: ${image}:${tag}
     network_mode: host
     volumes:
+    - ${PWD:-/tmp/heflow}:/workspace:ro
     - volume:/etc/heflow:ro
     working_dir: /workspace
   ui:
