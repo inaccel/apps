@@ -210,7 +210,7 @@ model = heflow.load_model('runs:/<Run ID>/model').connect(
                           (('grpc.max_receive_message_length', -1),
                            ('grpc.max_send_message_length', -1))))
 
-predictions = model.he_predict(X_test)
+predictions = model.predict(X_test)
 
 print('predictions=%s' % predictions)
 print('accuracy=%.3f' % sklearn.metrics.accuracy_score(y_test, predictions))
