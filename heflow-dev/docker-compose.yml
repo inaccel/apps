@@ -68,8 +68,8 @@ services:
     entrypoint:
     - mlflow
     - ui
-    - --backend-store-uri=/etc/heflow/mlruns
-    - --no-serve-artifacts
+    - --artifacts-destination=/etc/heflow/artifacts
+    - --backend-store-uri=/etc/heflow/artifacts
     healthcheck:
       test:
       - CMD
