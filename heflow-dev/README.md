@@ -63,7 +63,7 @@ and is reproduced below.
 ```python
 import click
 import heflow.sklearn
-import mlflow.sklearn
+import mlflow
 import sklearn.datasets
 import sklearn.linear_model
 import sklearn.metrics
