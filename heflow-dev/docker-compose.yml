@@ -68,6 +68,7 @@ services:
     entrypoint:
     - mlflow
     - ui
+    - --app-name=heflow
     - --artifacts-destination=/etc/heflow/artifacts
     - --backend-store-uri=/etc/heflow/artifacts
     healthcheck:
